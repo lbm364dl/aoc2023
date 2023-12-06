@@ -1,7 +1,7 @@
 defmodule Search do
   def binary_search(l, r, _func) when r-l <= 1, do: r
   def binary_search(l, r, func) do
-    m = Integer.floor_div(l+r, 2)
+    m = div(l+r, 2)
     case func.(m) do
       false -> binary_search(m, r, func)
       true -> binary_search(l, m, func)
