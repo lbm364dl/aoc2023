@@ -1,6 +1,4 @@
 defmodule DP do
-  use Agent
-
   def memo(xs, ys, f) do
     cached = Process.get({xs, ys, f})
     if cached do
