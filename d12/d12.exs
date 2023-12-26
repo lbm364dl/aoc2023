@@ -1,18 +1,13 @@
-# I think this is a fair dynamic programming solution
-# although part 2 takes up to 30s
-
 defmodule DP do
   use Agent
 
-  def start, do: Agent.start_link(fn -> %{} end, name: __MODULE__)
-
   def memo(xs, ys, f) do
-    cached =  Agent.get(__MODULE__, & Map.get(&1, {xs, ys, f}))
+    cached = Process.get({xs, ys, f})
     if cached do
       cached
     else
       v = ways(xs, ys, f)
-      Agent.update(__MODULE__, & Map.put(&1, {xs, ys, f}, v))
+      Process.put({xs, ys, f}, v)
       v
     end
   end
@@ -33,7 +28,7 @@ end
 
 solve = fn star ->
   File.stream!("input.txt")
-  |> Stream.map(fn ln ->
+  |> Task.async_stream(fn ln ->
     [l, counts] = ln |> String.trim() |> String.split(" ")
     counts = counts
     |> String.split(",")
@@ -53,9 +48,9 @@ solve = fn star ->
 
         {l, counts}
     end
-    DP.start()
     DP.memo(to_charlist(l), counts, hd(counts))
   end)
+  |> Enum.map(fn {:ok, v} -> v end)
   |> Enum.sum()
 end
 
