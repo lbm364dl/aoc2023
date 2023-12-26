@@ -1,27 +1,18 @@
 solve = fn first? ->
   File.stream!("input.txt")
   |> Stream.map(fn ln -> 
-    ln
-    |> String.split()
+    String.split(ln)
     |> Enum.map(&String.to_integer/1)
     |> Stream.unfold(fn l ->
       case Enum.all?(l, & &1 == 0) do
         true -> nil
-        false -> {
-          first? && List.first(l) || List.last(l), 
-          Enum.zip_with(tl(l), l, & &1-&2)
-        }
+        false -> {Enum.at(l, first? && 0 || -1), Enum.zip_with(tl(l), l, &-/2)}
       end
     end)
     |> then(fn ends ->
       case first? do
-        true ->
-          ends
-          |> Enum.reverse()
-          |> Enum.reduce(& &1-&2)
-        false ->
-          ends
-          |> Enum.sum()
+        true -> ends |> Enum.reverse() |> Enum.reduce(&-/2)
+        false -> ends |> Enum.sum()
       end
     end)
   end)
